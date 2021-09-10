@@ -3,6 +3,7 @@ import csv
 import functools
 import glob
 import os
+import random
 
 from collections import namedtuple
 
@@ -153,6 +154,7 @@ class LunaDataset(Dataset):
                  val_stride=0,
                  isValSet_bool=None,
                  series_uid=None,
+                 sortby_str='random',
             ):
         self.candidateInfo_list = copy.copy(getCandidateInfoList())
 
@@ -168,6 +170,15 @@ class LunaDataset(Dataset):
         elif val_stride > 0:
             del self.candidateInfo_list[::val_stride]
             assert self.candidateInfo_list
+            
+        if sortby_str == 'random':
+            random.shuffle(self.candidateInfo_list)
+        elif sortby_str == 'series_uid':
+            self.candidateInfo_list.sort(key=lambda x: (x.series_uid, x.center_xyz))
+        elif sortby_str == 'label_and_size':
+            pass
+        else:
+            raise Exception("Unknown sort: " + repr(sortby_str))
 
         log.info("{!r}: {} {} samples".format(
             self,

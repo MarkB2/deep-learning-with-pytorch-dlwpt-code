@@ -155,6 +155,7 @@ class LunaDataset(Dataset):
                  isValSet_bool=None,
                  series_uid=None,
                  sortby_str='random',
+                 index_range=None,
             ):
         self.candidateInfo_list = copy.copy(getCandidateInfoList())
 
@@ -175,10 +176,15 @@ class LunaDataset(Dataset):
             random.shuffle(self.candidateInfo_list)
         elif sortby_str == 'series_uid':
             self.candidateInfo_list.sort(key=lambda x: (x.series_uid, x.center_xyz))
+            if index_range:
+                fro, to = index_range
+                self.candidateInfo_list = self.candidateInfo_list[fro:to]
+                
         elif sortby_str == 'label_and_size':
             pass
         else:
             raise Exception("Unknown sort: " + repr(sortby_str))
+            
 
         log.info("{!r}: {} {} samples".format(
             self,
